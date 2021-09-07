@@ -101,11 +101,12 @@ class AudioFun:
     # file_name - name of file to convert
     def wav_to_txt(self):
         # Read audio file
-        data, sample_rate = soundfile.read(self.file_name + ".wav")
+        data, sample_rate = soundfile.read(self.file_name + "-reverb.wav")
         k = math.trunc(sample_rate * self.k_nosr)
 
-        # Replace first value in data with alpha
+        # Replace first value in data with alpha and its inversion
         data[0] = self.alpha
+        data[1] = 1 / (1 - self.alpha)
 
         # Store fixed point arithmetic in text file
         with open(self.file_name + ".txt", "w") as txt_out:

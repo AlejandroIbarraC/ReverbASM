@@ -515,6 +515,11 @@ rwAll:
     pop     eax                   ; restore eax
     call    writeNextLine         ; write alpha back to txt
     
+    ; skip inverted alpha for adding reverb
+    call    readNextLine          ; read fourth line (inverted alpha)
+    call    loadInput             ; load ascii input
+    call    writeNextLine         ; write line back on txt
+    
     ; calculate 1-alpha value
     call    calculateOneAlpha     ; calculates 1 - alpha parameter
     

@@ -18,22 +18,22 @@ if __name__ == '__main__':
     a = AudioFun(file_name, alpha, k, audio_bits)
 
     # Add reverb to audio
-    # a.reverb(is_add=True)
-    # print("Reverb added to " + file_name + ".wav")
+    #a.reverb(is_add=True)
+    #print("Reverb added to " + file_name + ".wav")
 
     # Convert audio to txt
-    a.wav_to_txt()
-    print("Converted " + file_name + ".wav to txt")
+    #a.wav_to_txt()
+    #print("Converted " + file_name + ".wav to txt")
 
     # Call assembly
-    os.system("./reverb-exec")
+    #os.system("./noreverb-exec")
 
     # Convert txt to audio list and play it back
     a.txt_to_wav()
     print("Converted " + file_name + ".txt to wav")
 
     # Remove reverb again
-    a.reverb(False)
+    #a.reverb(False)
 
     # Play new audio
     wave_obj = sa.WaveObject.from_wave_file(file_name + "-converted.wav")

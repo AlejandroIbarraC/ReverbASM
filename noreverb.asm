@@ -3,8 +3,8 @@
 %include "/home/alejandro/Desktop/fun.asm"
 
 section .data
-    inAudioFile    db  'audio.txt', 0h            ; name of input audio file
-    outAudioFile   db  'audio-reverb.txt', 0h     ; name of output audio file
+    inAudioFile    db  'audio-reverb.txt', 0h       ; name of input audio file
+    outAudioFile   db  'audio-noreverb.txt', 0h     ; name of output audio file
     
 section .bss
     ; file management
@@ -18,6 +18,7 @@ section .bss
     y_n_temp       resd     1     ; current output sample copy for string conversion
     k              resd     1     ; k parameter
     alpha          resd     1     ; alpha parameter
+    alphaInverted  resd     1     ; alpha inverted parameter
     oneAlpha       resd     1     ; 1-alpha parameter
     
     ; fixed point arithmetic
@@ -62,20 +63,12 @@ applyOperation:
     mov     eax, 0               ; clear eax
     mov     ebx, 0               ; clear ebx
     
-    mov     eax, op1             ; op1 memory pos on eax
-    mov     ebx, dword[x_n]      ; input sample value on ebx
-    mov     [eax], ebx           ; move input sample to op1 memory pos
+    ; operand 1 of first substraction
+    mov     eax, dword[x_n]      ; input sample value on eax
     
-    mov     eax, op2             ; op2 memory pos on eax
-    mov     ebx, dword[oneAlpha] ; alpha value on ebx
-    mov     [eax], ebx           ; move alpha value to op2 memory pos
-    
-    call    multiply             ; multiplies operands op1 and op2 on resultMulti
-    
-    mov     eax, [resultMulti]   ; store (1-alpha) * x(n) on eax
-    
-    ; second operand alpha * y(n-k)
+    ; second operand - alpha * y(n-k)
     push    eax
+    ; first multiplication
     mov     eax, [alpha]         ; load alpha on eax
     mov     [op1], eax           ; load op1 of multiplication (alpha)
     
@@ -89,17 +82,42 @@ applyOperation:
     
     mov     ebx, [resultMulti]   ; gets result of multiplication
     
+    ; second multiplication to invert
+    mov     eax, 65280           ; 65280 is -1 on fixed point arithmeti
+    mov     [op1], eax           ; load -1 on fixed point on op1
+    mov     [op2], ebx           ; load op2 alpha * x(n-k)
+    
+    call    multiply             ; multiply -1 * alpha * x(n-k)
+    
+    mov     ebx, [resultMulti]   ; load result of -alpha x(n-k) on ebx
+    
     pop     eax
     
     add     eax, ebx             ; adds both operands to build system equation
     
-    ; save sample to be written
-    mov     [y_n], ax           ; move eax result of operation to y_n position
+    push    ecx
+    mov     ecx, 0
+    mov     cx, ax               ; cut 16 bits and store in ecx
+    mov     eax, ecx             ; move back to eax
+    pop     ecx
     
-    ; save output sample on buffer
-    mov     eax, [y_n]           ; save output sample on eax
+    ; multiply by inverted alpha
+    mov     ebx, [alphaInverted]
+    
+    mov     [op1], eax           ; load op 1 as -alpha * x(n-k)
+    mov     [op2], ebx           ; load op 2 as alpha inverted
+    
+    call    multiply             ; multiply alpha inverted by -alpha * x(n-k)
+    
+    mov     eax, [resultMulti]   ; get last result on eax
+    
+    ; save sample to be written
+    mov     [y_n], ax            ; move eax result of operation to y_n position
+    
+    ; save input sample on buffer
+    mov     eax, [x_n]           ; save input sample on eax
     mov     ebx, [bufferPtr]     ; save buffer pointer on ebx
-    mov     [ebx], eax           ; store output sample on buffer
+    mov     [ebx], eax           ; store input sample on buffer
     
     ; update buffer memory pos 
     mov     ecx, [bufferCtr]     ; get buffer counter on ecx
@@ -519,10 +537,14 @@ rwAll:
     pop     eax                   ; restore eax
     call    writeNextLine         ; write alpha back to txt
     
-    ; skip inverted alpha for adding reverb
-    call    readNextLine          ; read fourth line (inverted alpha)
-    call    loadInput             ; load ascii input
-    call    writeNextLine         ; write line back on txt
+    ; get inverted 1 - alpha value
+    call    readNextLine          ; read third line (alpha value)
+    call    loadInput             ; convert alpha inverted ascii to num and store in x_n
+    push    eax                   ; store eax
+    mov     eax, [x_n]            ; move alpha inverted num in eax
+    mov     [alphaInverted], eax  ; save alpha inverted (eax) in alpha position
+    pop     eax                   ; restore eax
+    call    writeNextLine         ; write alpha inverted back to txt
     
     ; calculate 1-alpha value
     call    calculateOneAlpha     ; calculates 1 - alpha parameter
