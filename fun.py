@@ -42,12 +42,12 @@ class AudioFun:
 
     # Converts txt to wav file
     # file_name - name of file
-    def txt_to_wav(self):
+    def txt_to_wav(self, file_name, n_file_name):
         dual_bits = 2 * self.audio_bits
         is_first = True
         sample_rate = 44100
 
-        with open(self.file_name + "-reverb.txt", "r") as txt_in:
+        with open(file_name + ".txt", "r") as txt_in:
             audio_list = []
 
             while True:
@@ -95,13 +95,13 @@ class AudioFun:
                     audio_list.append(num)
 
             # Write on new audio wav file
-            soundfile.write(self.file_name + "-converted.wav", audio_list, sample_rate)
+            soundfile.write(n_file_name + ".wav", audio_list, sample_rate)
 
     # Convert audio wav file to a txt with fixed point arithmetic integer values
     # file_name - name of file to convert
-    def wav_to_txt(self):
+    def wav_to_txt(self, file_name, n_file_name):
         # Read audio file
-        data, sample_rate = soundfile.read(self.file_name + "-reverb.wav")
+        data, sample_rate = soundfile.read(file_name + ".wav")
         k = math.trunc(sample_rate * self.k_nosr)
 
         # Replace first value in data with alpha and its inversion
@@ -109,7 +109,7 @@ class AudioFun:
         data[1] = 1 / (1 - self.alpha)
 
         # Store fixed point arithmetic in text file
-        with open(self.file_name + ".txt", "w") as txt_out:
+        with open(n_file_name + ".txt", "w") as txt_out:
             # Write sample rate and k on first two lines
             sample_rate = str(sample_rate)
             k = str(k)

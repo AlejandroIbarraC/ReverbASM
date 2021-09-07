@@ -1,6 +1,5 @@
 %include "io.inc"
 
-%include "/home/alejandro/Desktop/fun.asm"
 
 section .data
     inAudioFile    db  'audio-reverb.txt', 0h       ; name of input audio file

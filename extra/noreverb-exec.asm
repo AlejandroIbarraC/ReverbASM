@@ -1,5 +1,5 @@
 section .data
-    inAudioFile    db  'audio-reverb.txt', 0h       ; name of input audio file
+    inAudioFile    db  'audio-known-reverb.txt', 0h       ; name of input audio file
     outAudioFile   db  'audio-noreverb.txt', 0h     ; name of output audio file
     
 section .bss
