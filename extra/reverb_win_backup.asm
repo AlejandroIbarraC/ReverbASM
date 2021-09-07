@@ -10,7 +10,7 @@ section .bss
     ; file management
     inDescr        resb     4     ; in file descriptor
     outDescr       resb     4     ; out file descriptor
-    lineIn         resb     6     ; store input audio line
+    lineIn         resb     7     ; store input audio line
     
     ; sample information
     x_n            resd     1     ; current input sample
@@ -63,11 +63,11 @@ applyOperation:
     mov     ebx, 0               ; clear ebx
     
     mov     eax, op1             ; op1 memory pos on eax
-    mov     ebx, dword[x_n]      ; input sample value on ebx
+    mov     ebx, dword[x_n]           ; input sample value on ebx
     mov     [eax], ebx           ; move input sample to op1 memory pos
     
     mov     eax, op2             ; op2 memory pos on eax
-    mov     ebx, dword[oneAlpha] ; alpha value on ebx
+    mov     ebx, dword[oneAlpha]      ; alpha value on ebx
     mov     [eax], ebx           ; move alpha value to op2 memory pos
     
     call    multiply             ; multiplies operands op1 and op2 on resultMulti
@@ -320,7 +320,7 @@ loadInputAux:
     mov     eax, 0                ; move a 0 to eax to restart register
     mov     al, byte[edx]         ; move in al (eax) a byte in post edx (line in start)
     
-    cmp     eax, 10               ; compare number in eax to 10 to determine end of num in lineIn
+    cmp     eax, 13               ; compare number in eax to 13 to determine end of num in lineIn
     jz      saveAscii             ; break if analyzed byte is 0d (end of number)
     
     sub     eax, 48               ; substract 48 to get number on eax
@@ -463,7 +463,7 @@ readFirstLine:
     int     80h                   ; os execute
     
     ; read file contents
-    mov     edx, 6                ; amount of bytes read on edx
+    mov     edx, 7                ; amount of bytes read on edx
     mov     ecx, lineIn           ; store input line on ecx
     mov     ebx, [inDescr]        ; store descriptor in ebx
     mov     eax, 3                ; kernel op code 3 sys_read
@@ -484,7 +484,7 @@ readNextLine:
     int     80h                   ; os execute
     
     ; read next bytes from file
-    mov     edx, 6                ; read 6 bytes
+    mov     edx, 7                ; read 7 bytes
     mov     ecx, lineIn           ; move memory address of file to ecx
     mov     ebx, [inDescr]        ; file descriptor
     mov     eax, 3                ; kernel op code 3 sys_read
@@ -612,7 +612,7 @@ writeFirstLine:
     mov     [outDescr], eax       ; store output file descriptor
 
     ; write line on file
-    mov     edx, 6                ; write 6 bytes to new txt file
+    mov     edx, 7                ; write 7 bytes to new txt file
     mov     ecx, lineIn           ; write contents of line in to new file
     mov     ebx, [outDescr]       ; move file descriptor of out file to ebx
     mov     eax, 4                ; kernel op code 4 to sys_write
@@ -633,7 +633,7 @@ writeNextLine:
     int     80h                   ; os execute 
 
     ; write next bytes from file
-    mov     edx, 6                ; write 6 bytes
+    mov     edx, 7                ; write 7 bytes
     mov     ecx, lineIn           ; move memory address of file to ecx
     mov     ebx, [outDescr]       ; file descriptor
     mov     eax, 4                ; kernel op code 3 sys_write

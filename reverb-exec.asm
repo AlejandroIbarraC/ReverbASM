@@ -1,7 +1,3 @@
-%include "io.inc"
-
-%include "/home/alejandro/Desktop/fun.asm"
-
 section .data
     inAudioFile    db  'audio.txt', 0h            ; name of input audio file
     outAudioFile   db  'audio-reverb.txt', 0h     ; name of output audio file
@@ -40,8 +36,8 @@ section .bss
     buffer         resd     2205  ; buffer length
 
 section .text
-global CMAIN
-CMAIN:
+global _start
+_start:
     mov ebp, esp; for correct debugging
     
     call    rwAll                 ; read write loop

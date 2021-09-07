@@ -33,7 +33,12 @@ class AudioFun:
             out = scipy.signal.lfilter(poles, zeroes, data)
 
         # Write to new wav with reverb
-        soundfile.write(self.file_name + "-reverb.wav", out, sample_rate)
+        file_name_write = self.file_name
+        if is_add:
+            file_name_write += "-reverb.wav"
+        else:
+            file_name_write += "-noreverb.wav"
+        soundfile.write(file_name_write, out, sample_rate)
 
     # Converts txt to wav file
     # file_name - name of file
@@ -42,13 +47,13 @@ class AudioFun:
         is_first = True
         sample_rate = 44100
 
-        with open(self.file_name + "-text.txt", "r") as txt_in:
+        with open(self.file_name + "-reverb.txt", "r") as txt_in:
             audio_list = []
 
             while True:
                 # Read txt input file until the end
                 line = txt_in.readline()
-                if line == "FINAL":
+                if line == "FINAL\n":
                     break
 
                 if is_first:
@@ -103,7 +108,7 @@ class AudioFun:
         data[0] = self.alpha
 
         # Store fixed point arithmetic in text file
-        with open(self.file_name + "-text.txt", "w") as txt_out:
+        with open(self.file_name + ".txt", "w") as txt_out:
             # Write sample rate and k on first two lines
             sample_rate = str(sample_rate)
             k = str(k)
