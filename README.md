@@ -52,7 +52,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments 📎
 
 * Costa Rica Institute of Technology
-* Kevin Cordero - [Skryfall](https://github.com/Skryfall)
+* Kevin Cordero - [kevinscorzu](https://github.com/kevinscorzu)
 
 <p align="center">This project was made with academical purposes. J.A Ibarra. 2021</p
 ```
